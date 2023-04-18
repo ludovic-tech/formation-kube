@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubernetes.io/change-cause: "mise a jour 1.14 to 1.20"
+  labels:
+    app: web
+  name: nginx-deploy
+  namespace: forma-ludo
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 5
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - image: nginx:1.20
+        name: nginx
+

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apache-php
+  namespace: ludovic
+  annotations:
+   nginx.ingress.kubernetes.io/rewrite-target: /$2
+          #    kubernetes.io/ingress.class: "nginx"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: portail.ludovic.tech
+      http:
+        paths:
+          - backend:
+              service:
+                name: apache-php
+                port:
+                  number: 80
+            path: /ludo
+            pathType: Prefix

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Simple CRUD</title>
+</head>
+
+<!-- Java script to check checkbox option -->
+        <script>
+                function handleData()
+{
+    var form_data = new FormData(document.querySelector("form"));
+
+    if(!form_data.has("app[]"))
+    {
+        document.getElementById("chk_option_error").style.visibility = "visible";
+      return false;
+    }
+    else
+    {
+        document.getElementById("chk_option_error").style.visibility = "hidden";
+      return true;
+    }
+
+}
+
+        </script>
+
+
+<body style="background-color:powderblue;">
+<center>
+ <h2>Simple CRUD PHP - MySQL/MariaDB</h2>
+
+ <h3>Add Data Server</h3>
+<p><a href="index.php">Back</a>
+ <form action="create_db.php" method="post"  onsubmit="return handleData()">
+  <table cellpadding="3" cellspacing="0">
+
+          <!-- Create an id field with single-line text input -->
+   <tr>
+    <td>ID</td>
+    <td><input type="text" name="id" placeholder="Enter ID" required></td>
+   </tr>
+
+   <!-- Create a name field with single-line text input-->
+   <tr>
+    <td>Hostname</td>
+    <td><input type="text" name="hostname" placeholder="Enter Name" size="30" required></td>
+   </tr>
+
+   <!-- Create an gender field with radio button -->
+   <tr>
+    <td>Data Center</td>
+    <td>
+     <input type="radio" name="dc" value="USA" required> USA
+     <input type="radio" name="dc" value="Singapore"> Singapore
+    </td>
+   </tr>
+
+   <!-- Create an division field with drop-down menu -->
+  <tr>
+    <td>Brand</td>
+    <td>
+        <select name="brand" required>
+                <option value="">Choose Brand</option>
+                <option value="HP">HP</option>
+                <option value="Dell">Dell</option>
+                <option value="Huawei">Huawei</option>
+                <option value="Lenovo">Lenovo</option>
+                <option value="Supermicro">Supermicro</option>
+        </select>
+    </td>
+   </tr>
+
+   <!-- Create a hobby field with checkboxes -->
+    <tr>
+    <td>Application</td>
+   <td>
+     <input type="checkbox"  name="app[]" value="Java" > Java
+     <input type="checkbox"  name="app[]" value="PHP" > PHP
+     <input type="checkbox"  name="app[]" value="DB"> Database
+     <input type="checkbox"  name="app[]" value="Others"> Others
+     <div style="visibility:hidden; color:red; " id="chk_option_error">
+                Please select at least one option.
+           </div>
+
+    </td>
+   </tr>
+
+
+        <!-- Create an address field with drop-down menu -->
+  <tr>
+    <td>Address</td>
+    <td><textarea rows="4" cols="25" name="note" placeholder="Enter note if necessary"></textarea></td>
+   </tr>
+
+        <!-- Create a submit and reset button -->
+   <tr>
+    <td><input type="submit" name="save" value="Save">&nbsp;&nbsp;<input type="reset"></td>
+   </tr>
+
+
+  </table>
+ </form>
+
+</center>
+</body>
+</html>

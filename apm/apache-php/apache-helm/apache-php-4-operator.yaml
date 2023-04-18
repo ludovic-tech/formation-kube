@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    prometheus.io/port: "9117"
+    prometheus.io/scrape: "true"
+  labels:
+    app: web
+  name: apache-php
+  namespace: apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - env:
+        - name: APACHE_HTTP_PORT_NUMBER
+          value: "8080"
+        - name: APACHE_HTTPS_PORT_NUMBER
+          value: "8443"
+        image: tutum/apache-php
+        imagePullPolicy: IfNotPresent
+        name: apache
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+      - command:
+        - /bin/apache_exporter
+        - --scrape_uri
+        - http://status.localhost:8080/server-status/?auto
+        env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        image: docker.io/bitnami/apache-exporter:0.11.0-debian-11-r48
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: metrics
+        ports:
+        - containerPort: 9117
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: apache-exporter
+  name: apache-prom-metrics
+  namespace: ludo-forma
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/scheme: 'http'
+    prometheus.io/port: '9117'
+    prometheus.io/path: '/metrics'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9117
+    name: prometheus
+    protocol: TCP
+  selector:
+    app: apache-php
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: apache-servicemon
+  namespace: ludo-forma
+  labels:
+    release: prometheus
+spec:
+  endpoints:
+  - interval: 5s
+    port: prometheus
+  selector:
+    matchLabels:
+      app: apache-exporter

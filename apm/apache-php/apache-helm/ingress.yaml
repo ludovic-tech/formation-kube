@@ -1,0 +1,65 @@
+# used to expose main port of application, port 8080
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-boot-with-docker-push
+  #namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+    # allows http without forcing redirect to ssl
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+    # no need for rewrite, no regex in prefix paths below
+    #nginx.ingress.kubernetes.io/rewrite-target: /api/$2
+
+spec:
+  tls:
+  - hosts: [ 'k3s.local' ]
+    # secret must be in same namespace
+    secretName: tls-credential
+  rules:
+
+  - host: k3s.local
+    http:
+      paths:
+
+      # main REST API controllers, exposed by Spring
+      - pathType: Prefix
+        path: /api/product
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: /api/user
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8080
+      # set of metrics to be auto-picked up by Prometheus
+      - pathType: Prefix
+        path: /metrics
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8080
+
+      # for OpenDocs Swagger UI and Swagger config
+      - pathType: Prefix
+        path: /swagger-ui
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: /v3/api-docs
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8080

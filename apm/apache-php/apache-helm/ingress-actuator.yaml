@@ -1,0 +1,46 @@
+# used to expose management port 8081 of service that has actual metrics
+# this would ONLY be applied in a development environment so you could test these
+# endpoints via curl or web browser
+#
+# Prometheus can scrape the 8081 mgmt port of the service without this ingress!
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-boot-with-docker-push
+  #namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+    # allows http without forcing redirect to ssl
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+    # annotation that tells prometheus additional scrape job to target
+    prometheus.io/path: /actuator/prometheus-custom
+    prometheus.io/scrape: "true"
+
+    # if switching context path
+    #nginx.ingress.kubernetes.io/rewrite-target: /actuator/$2
+
+spec:
+  tls:
+  - hosts: [ 'k3s.local' ]
+    # secret must be in same namespace
+    secretName: tls-credential
+  rules:
+
+  # do not need to change /actuator to /metrics
+  # but if we had multiple REST deployments, then being able to differentiate would be required
+  - host: k3s.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/actuator"
+        # if wanting to switch out context path
+        #path: "/metrics(/|$)(.*)"
+        backend:
+          service:
+            name: spring-boot-with-docker-push
+            port:
+              number: 8081
+

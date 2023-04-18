@@ -1,0 +1,20 @@
+# need to set 'ruleSelectorNilUsesHelmValues' in helm chart to false so helm annotations and labels not necessary
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: spring-boot-with-docker-push
+  namespace: default
+spec:
+  groups:
+  - name: spring-boot-with-docker-push.rules
+    rules:
+
+    # metric exposed at /prometheus
+    - alert: LowUserCount
+      annotations:
+        description: on {{ $externalLabels.cluster }}, only {{ $value }} users left
+        remediation: login to {{ $externalLabels.env }} cluster {{ $externalLabels.cluster }} using jumpbox {{ $externalLabels.jumpbox }} and provision more Users
+      expr: usercontroller_usercount{}<2
+      for: 15s # 1m
+      labels:
+        severity: critical

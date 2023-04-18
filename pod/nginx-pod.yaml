@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-ludo
+  namespace: forma-ludo
+  labels:
+    app: web
+    version: '1.9'
+spec:
+  containers:
+  - image: nginx
+    name: nginx

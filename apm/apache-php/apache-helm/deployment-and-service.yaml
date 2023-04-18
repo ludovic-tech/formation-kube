@@ -1,0 +1,98 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-with-docker-push
+  # allow for ns override: kubectl -n <ns> apply ...
+  #namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-with-docker-push
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spring-boot-with-docker-push
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+
+      containers:
+      - name: spring-boot-with-docker-push
+        image: fabianlee/springbootwithdockerpush:<%=version%>
+        imagePullPolicy: Always
+
+        # resource limits
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "1000m" # one vcpu
+          limits:
+            memory: "4096Mi"
+            cpu: "2000m" # two vcpu
+
+        env:
+
+        # override 'dev' default profile in application.properties
+        #- name: spring.profiles.active
+        #  value: prod
+
+        # pulling pod fields using Downward API
+        - name: K8S_node_name
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_namespace
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+        # default message
+        - name: JAVA_MSG
+          value: "I wuz here"
+
+        # check for lifetime liveness, restarts if dead
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8081
+          initialDelaySeconds: 20
+          periodSeconds: 10
+
+        # check for initial readiness
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8081
+          initialDelaySeconds: 20 
+          periodSeconds: 10
+
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-with-docker-push
+  #namespace: default
+  labels:
+    app: spring-boot-with-docker-push
+  annotations:
+    # set to true if you want our custom prometheus scraper job to gather custom metrics
+    prometheus.io/path: /actuator/prometheus
+    prometheus.io/scrape: "false"
+spec:
+  ports:
+
+  - port: 8080 # available at this service
+    name: http
+    targetPort: 8080 # exposed from inside container
+    protocol: TCP
+
+  - port: 8081 # available at this service
+    name: http-actuator-metrics # ends with 'metrics' in case we want custom scraper to recognize
+    targetPort: 8081 # exposed from inside container
+    protocol: TCP
+
+  selector:
+    app: spring-boot-with-docker-push

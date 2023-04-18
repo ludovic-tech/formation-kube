@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: apache-php
+  namespace: ludo-forma
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: apache-data
+      containers:
+      - image: tutum/apache-php
+        name: apache-php
+        volumeMounts:
+        - name: www
+          mountPath: /var/www/html

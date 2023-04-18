@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-empty
+spec:
+  volumes:
+  - name: volumevide
+    emptyDir: {}
+  containers:
+  - image: busybox
+    name: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 600"]
+    volumeMounts:
+    - name: volumevide
+      mountPath: /mydata

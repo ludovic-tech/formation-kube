@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: db
+  name: db-mariadb
+  namespace: forma-ludo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      volumes:
+      - name: db
+        persistentVolumeClaim:
+          claimName: db-data
+      containers:
+      - image: mariadb
+        name: mariadb
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-secret
+              key: password
+              #- name: MYSQL_ROOT_PASSWORD
+              #  value: root
+        volumeMounts:
+        - name: db
+          mountPath: /var/lib/mysql

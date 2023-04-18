@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: test-servicemon
+  namespace: ingress
+  labels:
+    release: prometheus
+spec:
+  endpoints:
+  - interval: 5s
+    port: prometheus
+  selector:
+    matchLabels:
+      app: test-exporter

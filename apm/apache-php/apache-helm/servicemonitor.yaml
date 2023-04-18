@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    # specified as matchLabel in 'Prometheus' CRD
+    # this ServiceMonitor will not be found by prometheus unless it matches
+    release: prometheus
+  name: apache
+  # does not need to be in 'prom' namespace, works fine in default
+  #  namespace: default
+spec:
+  endpoints:
+  - path: /metrics
+    port: metrics
+    scheme: http
+    interval: 60s
+
+  jobLabel: apache
+  namespaceSelector:
+    matchNames:
+    - apache
+  selector:
+    matchLabels:
+      app: web

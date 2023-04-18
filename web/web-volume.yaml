@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: nginx-deploy
+  namespace: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: web-nfs
+      containers:
+      - image: nginx:1.19
+        name: nginx
+      initContainers:
+      - name: init-web
+        image: busybox:1.28
+        command: ['sh', '-c', "echo init par initContainer > /usr/share/nginx/html/index.html"]
+        volumeMounts:
+         - name: www
+           mountPath: /usr/share/nginx/html
